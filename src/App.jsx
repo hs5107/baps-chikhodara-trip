@@ -43,7 +43,7 @@ const S = `
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
 .hdr{background:linear-gradient(135deg,#1C1917,#292524 60%,#1C1917);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.4)}
 .hdr-in{max-width:1160px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:11px 18px}
-.hdr-logo{width:44px;height:44px;background:linear-gradient(135deg,var(--sf),var(--gold));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;box-shadow:0 4px 12px rgba(249,115,22,.4)}
+.hdr-logo{width:44px;height:44px;border-radius:11px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .hdr-title{font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;line-height:1.1}
 .hdr-sub{font-size:.7rem;opacity:.6;margin-top:2px;font-weight:700;letter-spacing:.06em}
 .hdr-dt{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:5px 13px;font-size:.76rem;text-align:right;flex-shrink:0}
@@ -158,7 +158,7 @@ export default function App() {
   const [newStop, setNewStop] = useState({ name:"", icon:"📍", time:"" });
   const [activeStop, setActiveStop] = useState(null);
   const [kids, setKids] = useState([]);
-  const [newKid, setNewKid] = useState({ name:"", age:"", segment:"BALAK", phone:"" });
+  const [newKid, setNewKid] = useState({ name:"", segment:"BALAK", phone:"" });
   const [att, setAtt] = useState({});
   const [scanIn, setScanIn] = useState("");
   const [scanRes, setScanRes] = useState(null);
@@ -272,9 +272,9 @@ export default function App() {
   const addKid = async () => {
     if (!newKid.name.trim()) return;
     const id = genId(newKid.segment, kids);
-    const k = { id, ...newKid, name:newKid.name.trim(), age:newKid.age||"–" };
+    const k = { id, ...newKid, name:newKid.name.trim(), };
     await supabase.from("kids").insert(k);
-    setNewKid(p => ({ name:"", age:"", segment:p.segment, phone:"" }));
+    setNewKid(p => ({ name:"", segment:p.segment, phone:"" }));
   };
   const delKid = async id => {
     await supabase.from("kids").delete().eq("id", id);
@@ -482,8 +482,8 @@ export default function App() {
 
       <header className="hdr">
         <div className="hdr-in">
-          <div className="hdr-logo" style={{background:"none",boxShadow:"none",padding:0,overflow:"hidden",borderRadius:"11px"}}>
-            <img src="/logo-right.png" alt="BAPS" style={{width:"44px",height:"44px",objectFit:"cover",display:"block",borderRadius:"11px"}} />
+          <div className="hdr-logo">
+            <img src="/logo-right.png" alt="BAPS" style={{width:"44px",height:"44px",objectFit:"cover",display:"block"}} />
           </div>
           <div>
             <div className="hdr-title">BAPS Chikhodara Mandal</div>
@@ -659,9 +659,7 @@ export default function App() {
                     onChange={e=>setNewKid(p=>({...p,name:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&addKid()} />
                 </div>
                 <div className="fld">
-                  <label>Age</label>
-                  <input className="inp" type="number" placeholder="10" value={newKid.age}
-                    onChange={e=>setNewKid(p=>({...p,age:e.target.value}))} />
+                  
                 </div>
                 <div className="fld">
                   <label>Parent Phone</label>
@@ -684,7 +682,7 @@ export default function App() {
                         <div className={`av av-${k.segment.toLowerCase()}`} style={{width:33,height:33,fontSize:".83rem"}}>{initials(k.name)}</div>
                         <div style={{flex:1}}>
                           <div style={{fontWeight:800,fontSize:".88rem"}}>{k.name}</div>
-                          <div style={{fontSize:".7rem",color:"var(--mt)"}}>Age {k.age} · {k.phone||"–"}</div>
+                          <div style={{fontSize:".7rem",color:"var(--mt)"}}>{k.phone||"–"}</div>
                         </div>
                         <span className={`stag st-${k.segment.toLowerCase()}`}>{k.segment}</span>
                         <code style={{fontSize:".75rem",fontWeight:700,background:"#fff",borderRadius:6,padding:"2px 7px"}}>{k.id}</code>
@@ -724,7 +722,7 @@ export default function App() {
                           <div className={`av av-${kid.segment.toLowerCase()}`}>{initials(kid.name)}</div>
                           <div>
                             <div className="kc-name">{kid.name}</div>
-                            <div className="kc-mt">Age {kid.age}</div>
+                            
                             <span className={`stag st-${kid.segment.toLowerCase()}`}>{kid.segment}</span>
                           </div>
                         </div>
@@ -812,14 +810,14 @@ export default function App() {
                     <div className="qrc-body">
                       <div className={`av av-${kid.segment.toLowerCase()}`} style={{width:48,height:48,fontSize:"1rem",margin:"0 auto 9px"}}>{initials(kid.name)}</div>
                       <div style={{fontFamily:"'Baloo 2',cursive",fontWeight:900,fontSize:".92rem",marginBottom:2}}>{kid.name}</div>
-                      <div style={{fontSize:".7rem",color:"var(--mt)",marginBottom:11}}>Age {kid.age} · {kid.segment}</div>
+                      <div style={{fontSize:".7rem",color:"var(--mt)",marginBottom:11}}>{kid.segment}</div>
                       <div style={{display:"flex",justifyContent:"center",marginBottom:9}}>
                         <QRCode value={kid.id} size={105} color={kid.segment==="BALAK"?"#1e40af":"#6d28d9"}/>
                       </div>
                       <div style={{fontFamily:"monospace",fontSize:".88rem",fontWeight:900,background:kid.segment==="BALAK"?"var(--bls)":"var(--yus)",borderRadius:8,padding:"5px 0",color:kid.segment==="BALAK"?"var(--bl)":"var(--yu)",letterSpacing:".1em"}}>
                         {kid.id}
                       </div>
-                      {kid.phone&&<div style={{fontSize:".65rem",color:"var(--mt)",marginTop:5}}>📞   {kid.phone}</div>}
+                      {kid.phone&&<div style={{fontSize:".65rem",color:"var(--mt)",marginTop:5}}>📞 {kid.phone}</div>}
                     </div>
                   </div>
                 ))}
@@ -837,7 +835,7 @@ export default function App() {
             <div className="md-n">{selKid.name}</div>
             <div className="md-m">
               <span className={`stag st-${selKid.segment.toLowerCase()}`}>{selKid.segment}</span>
-              {" · "}Age {selKid.age}{selKid.phone?` · 📞 ${selKid.phone}`:""}
+              {selKid.phone?` · 📞 ${selKid.phone}`:""}
             </div>
             <div style={{display:"flex",justifyContent:"center",marginBottom:13}}>
               <QRCode value={selKid.id} size={135} color={selKid.segment==="BALAK"?"#1e40af":"#6d28d9"}/>
@@ -861,10 +859,8 @@ export default function App() {
       )}
 
       <footer style={{textAlign:"center",padding:"16px",fontSize:".73rem",color:"var(--mt)",borderTop:"1px solid var(--bdr)",background:"#fff",marginTop:36}}>
-        🛕 BAPS Chikhodara Mandal · Jai Swaminarayan 🙏       
-        
+        🛕 BAPS Chikhodara Mandal · Kids Trip QR Attendance · Jai Swaminarayan 🙏
       </footer>
-      
     </>
   );
 }

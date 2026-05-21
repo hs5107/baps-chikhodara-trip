@@ -347,11 +347,11 @@ export default function App() {
 
       // Card dimensions
       const cardW = 95;   // mm wide
-      const cardH = 80;   // mm tall
-      const stripH = 15;  // bottom strip height mm
+      const cardH = 65;   // mm tall
+      const stripH = 12;  // bottom strip height mm
       const cols = 2;
       const gapX = 5;
-      const gapY = 6;
+      const gapY = 5;
       const marginX = (210 - cols * cardW - gapX) / 2;
       const marginY = 10;
       const CONTACT = "9081840511 / 8160026021";
@@ -364,7 +364,7 @@ export default function App() {
         const kid = filteredKids[i];
         const isBalak = kid.segment === "BALAK";
 
-        if (pageRow >= 3) { doc.addPage(); pageRow = 0; col = 0; }
+        if (pageRow >= 4) { doc.addPage(); pageRow = 0; col = 0; }
 
         const x = marginX + col * (cardW + gapX);
         const y = marginY + pageRow * (cardH + gapY);

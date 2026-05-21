@@ -329,9 +329,9 @@ export default function App() {
 
       // A4 = 210 x 297mm
       // 2 cards per row, card = 95mm wide x 65mm tall, gap 5mm, margin 10mm
-      const cardW = 95, cardH = 65, cols = 2, gapX = 5, gapY = 6;
+      const cardW = 95, cardH = 75, cols = 2, gapX = 5, gapY = 5;
       const marginX = (210 - cols * cardW - gapX) / 2; // = 5mm each side
-      const marginY = 10;
+      const marginY = 8;
 
       const doc = new jsPDF({ unit: "mm", format: "a4" });
 
@@ -353,6 +353,16 @@ export default function App() {
         loadImg("/bottom-image.png"),
       ]);
 
+      // Calculate strip height to preserve aspect ratio
+      const stripImg = new Image();
+      await new Promise(res => {
+        stripImg.onload = res;
+        stripImg.onerror = res;
+        stripImg.src = "/bottom-image.png";
+      });
+      const stripAspect = stripImg.naturalWidth / stripImg.naturalHeight;
+      const stripH = cardW / stripAspect; // correct height for full width
+
       const CONTACT = "9081840511 / 8160026021";
       let col = 0, pageRow = 0;
 
@@ -360,7 +370,7 @@ export default function App() {
         const kid = filteredKids[i];
 
         // New page when rows overflow (4 rows per page max)
-        if (pageRow >= 4) { doc.addPage(); pageRow = 0; col = 0; }
+        if (pageRow >= 3) { doc.addPage(); pageRow = 0; col = 0; }
 
         const x = marginX + col * (cardW + gapX);
         const y = marginY + pageRow * (cardH + gapY);
@@ -375,7 +385,7 @@ export default function App() {
         // Gold accent lines top & bottom
         doc.setFillColor(200, 158, 70);
         doc.rect(x + 3, y + 1.2, cardW - 6, 0.8, "F");
-        doc.rect(x + 3, y + cardH - 2, cardW - 6, 0.8, "F");
+        // bottom accent drawn after strip
 
         // ── LOGO SIZES & POSITIONS ──
         const logoS = 26; // logo diameter mm
@@ -438,12 +448,11 @@ export default function App() {
         doc.text("Ph:", divL + 4.5, phY - 0.8, { align: "center" });
         doc.setTextColor(15, 15, 15);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(8.5);
-        doc.text(CONTACT, divL + 8, phY, {});
+        doc.setFontSize(7.5);
+        doc.text(CONTACT, divL + 9, phY, {});
 
         // QR CODE — 22x22mm, always fits
-        // Strip height reserved at bottom
-        const stripH = 10;
+        // Strip height reserved at bottom (uses aspect ratio calculated above)
         const stripY = y + cardH - stripH;
 
         // QR — positioned so it fits above strip with ID below it
@@ -472,9 +481,21 @@ export default function App() {
         doc.setFontSize(7);
         doc.text(kid.id, ccx, qrY2 + qrSize + 5, { align: "center" });
 
-        // ── BOTTOM STRIP — actual image ──
+        // ── BOTTOM STRIP — actual image with rounded bottom corners ──
         if (bottomStrip) {
           doc.addImage(bottomStrip, "PNG", x, stripY, cardW, stripH);
+          // Cover square corners with white to fake rounded corners (bottom only)
+          const cr = 3;
+          doc.setFillColor(255, 255, 255);
+          doc.setDrawColor(255, 255, 255);
+          // bottom-left corner square cover
+          doc.rect(x, y + cardH - cr, cr, cr, "F");
+          // bottom-right corner square cover
+          doc.rect(x + cardW - cr, y + cardH - cr, cr, cr, "F");
+          // Now redraw the card outer rounded border on top to restore look
+          doc.setDrawColor(185, 148, 80);
+          doc.setLineWidth(0.7);
+          doc.roundedRect(x, y, cardW, cardH, 3, 3, "S");
         }
 
         // advance

@@ -348,8 +348,9 @@ export default function App() {
         img.onerror = () => res(null);
         img.src = path;
       });
-      const [logoLeft] = await Promise.all([
+      const [logoLeft, bottomStrip] = await Promise.all([
         loadImg("/logo-left.png"),
+        loadImg("/bottom-image.png"),
       ]);
 
       const CONTACT = "9081840511 / 8160026021";
@@ -462,6 +463,13 @@ export default function App() {
         doc.setFont("courier", "bold");
         doc.setFontSize(6);
         doc.text(kid.id, ccx, qrY2 + qrSize + 4, { align: "center" });
+
+        // ── BOTTOM STRIP — actual image ──
+        if (bottomStrip) {
+          const stripH = 10;
+          const stripY = y + cardH - stripH;
+          doc.addImage(bottomStrip, "PNG", x, stripY, cardW, stripH);
+        }
 
         // advance
         col++;

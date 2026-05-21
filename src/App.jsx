@@ -475,18 +475,11 @@ export default function App() {
           doc.rect(x + cardW - cr, y + cardH - cr, cr, cr, "F");
         }
 
-        // ── BAPS text below strip ──
-        doc.setTextColor(80, 60, 20);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(5.5);
-        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, y + cardH - 1.5, { align: "center" });
-
-        // ── BAPS text in space between QR and strip ──
-        const bapsTextY = stripY - 2;
+        // ── BAPS text — between QR bottom and strip top ──
         doc.setTextColor(100, 70, 20);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(5.5);
-        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, bapsTextY, { align: "center" });
+        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, stripY - 2, { align: "center" });
 
         // Redraw border on top of everything
         doc.setDrawColor(185, 148, 80);

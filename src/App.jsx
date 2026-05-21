@@ -347,7 +347,7 @@ export default function App() {
 
       // Card dimensions
       const cardW = 95;   // mm wide
-      const cardH = 65;   // mm tall
+      const cardH = 68;   // mm tall (extra 3mm for BAPS text below strip)
       const stripH = 13;  // bottom strip height mm
       const cols = 2;
       const gapX = 5;
@@ -474,6 +474,18 @@ export default function App() {
           doc.rect(x, y + cardH - cr, cr, cr, "F");
           doc.rect(x + cardW - cr, y + cardH - cr, cr, cr, "F");
         }
+
+        // ── BAPS text below strip ──
+        doc.setTextColor(80, 60, 20);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(5.5);
+        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, y + cardH - 1.5, { align: "center" });
+
+        // ── BAPS text below strip ──
+        doc.setTextColor(100, 70, 20);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(5.5);
+        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, y + cardH - 1.5, { align: "center" });
 
         // Redraw border on top of everything
         doc.setDrawColor(185, 148, 80);

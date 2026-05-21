@@ -442,15 +442,23 @@ export default function App() {
         doc.text(CONTACT, divL + 8, phY, {});
 
         // QR CODE — 22x22mm, always fits
-        const qrSize = 22;
+        // Strip height reserved at bottom
+        const stripH = 10;
+        const stripY = y + cardH - stripH;
+
+        // QR — positioned so it fits above strip with ID below it
+        const qrSize = 20;
         const qrX = ccx - qrSize / 2;
-        const qrY2 = phY + 4;
+        // ID will be 5mm, gap 2mm above strip = 7mm reserved below QR
+        const qrY2 = stripY - qrSize - 7;
+
         const qrCanvas = document.createElement("canvas");
         await QRCodeLib.default.toCanvas(qrCanvas, kid.id, {
           width: 180, margin: 1,
           color: { dark: "#111111", light: "#ffffff" }
         });
         const qrDataUrl = qrCanvas.toDataURL("image/png");
+
         // White bg + blue border
         doc.setFillColor(255, 255, 255);
         doc.setDrawColor(140, 165, 210);
@@ -458,16 +466,14 @@ export default function App() {
         doc.roundedRect(qrX - 1.5, qrY2 - 1.5, qrSize + 3, qrSize + 3, 2, 2, "FD");
         doc.addImage(qrDataUrl, "PNG", qrX, qrY2, qrSize, qrSize);
 
-        // ID
+        // ID — placed between QR and strip with enough space
         doc.setTextColor(85, 90, 125);
         doc.setFont("courier", "bold");
-        doc.setFontSize(6);
-        doc.text(kid.id, ccx, qrY2 + qrSize + 4, { align: "center" });
+        doc.setFontSize(7);
+        doc.text(kid.id, ccx, qrY2 + qrSize + 5, { align: "center" });
 
         // ── BOTTOM STRIP — actual image ──
         if (bottomStrip) {
-          const stripH = 10;
-          const stripY = y + cardH - stripH;
           doc.addImage(bottomStrip, "PNG", x, stripY, cardW, stripH);
         }
 

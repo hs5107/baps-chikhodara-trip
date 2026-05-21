@@ -437,7 +437,7 @@ export default function App() {
         // ── QR CODE ──
         // Available space between phone and strip
         const contentBottom = y + cardH - stripH - 3;
-        const qrSize = Math.min(28, contentBottom - phY - 6);
+        const qrSize = Math.min(30, contentBottom - phY - 6);
         const qrY = phY + 5;
         const qrX = ccx - qrSize / 2;
 

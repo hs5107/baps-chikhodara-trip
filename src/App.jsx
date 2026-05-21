@@ -404,7 +404,7 @@ export default function App() {
         // ── BAPS header text ──
         doc.setTextColor(130, 90, 20);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(5.5);
+        doc.setFontSize(7);
         doc.text("BAPS Chikhodara Mandal - Anand", ccx, y + 6, { align: "center" });
 
         // ── NAME ──

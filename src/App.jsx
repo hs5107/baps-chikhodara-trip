@@ -327,15 +327,6 @@ export default function App() {
         import("qrcode"),
       ]);
 
-      // A4 = 210 x 297mm
-      // 2 cards per row, card = 95mm wide x 65mm tall, gap 5mm, margin 10mm
-      const cardW = 95, cardH = 75, cols = 2, gapX = 5, gapY = 5;
-      const marginX = (210 - cols * cardW - gapX) / 2; // = 5mm each side
-      const marginY = 8;
-
-      const doc = new jsPDF({ unit: "mm", format: "a4" });
-
-      // Load logos from src folder
       const loadImg = (path) => new Promise(res => {
         const img = new Image();
         img.crossOrigin = "anonymous";
@@ -348,33 +339,35 @@ export default function App() {
         img.onerror = () => res(null);
         img.src = path;
       });
+
       const [logoLeft, bottomStrip] = await Promise.all([
         loadImg("/logo-left.png"),
         loadImg("/bottom-image.png"),
       ]);
 
-      // Calculate strip height to preserve aspect ratio
-      const stripImg = new Image();
-      await new Promise(res => {
-        stripImg.onload = res;
-        stripImg.onerror = res;
-        stripImg.src = "/bottom-image.png";
-      });
-      const stripAspect = stripImg.naturalWidth / stripImg.naturalHeight;
-      const stripH = cardW / stripAspect; // correct height for full width
-
+      // Card dimensions
+      const cardW = 95;   // mm wide
+      const cardH = 80;   // mm tall
+      const stripH = 15;  // bottom strip height mm
+      const cols = 2;
+      const gapX = 5;
+      const gapY = 6;
+      const marginX = (210 - cols * cardW - gapX) / 2;
+      const marginY = 10;
       const CONTACT = "9081840511 / 8160026021";
+      const logoS = 26;
+
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
       let col = 0, pageRow = 0;
 
       for (let i = 0; i < filteredKids.length; i++) {
         const kid = filteredKids[i];
+        const isBalak = kid.segment === "BALAK";
 
-        // New page when rows overflow (4 rows per page max)
         if (pageRow >= 3) { doc.addPage(); pageRow = 0; col = 0; }
 
         const x = marginX + col * (cardW + gapX);
         const y = marginY + pageRow * (cardH + gapY);
-        const isBalak = kid.segment === "BALAK";
 
         // ── CARD BACKGROUND + BORDER ──
         doc.setFillColor(252, 249, 243);
@@ -382,84 +375,71 @@ export default function App() {
         doc.setLineWidth(0.7);
         doc.roundedRect(x, y, cardW, cardH, 3, 3, "FD");
 
-        // Gold accent lines top & bottom
+        // Gold accent top line
         doc.setFillColor(200, 158, 70);
         doc.rect(x + 3, y + 1.2, cardW - 6, 0.8, "F");
-        // bottom accent drawn after strip
 
-        // ── LOGO SIZES & POSITIONS ──
-        const logoS = 26; // logo diameter mm
-        const logoY = y + (cardH - logoS) / 2;
-
-        // LEFT LOGO
+        // ── LEFT LOGO ──
+        const logoX = x + 2;
+        const logoY = y + (cardH - stripH - logoS) / 2 + 2;
         if (logoLeft) {
-          doc.addImage(logoLeft, "PNG", x + 2, logoY, logoS, logoS);
+          doc.addImage(logoLeft, "PNG", logoX, logoY, logoS, logoS);
         } else {
-          const lx = x + 2 + logoS / 2, ly = y + cardH / 2;
-          doc.setFillColor(170, 120, 30); doc.circle(lx, ly, logoS/2, "F");
-          doc.setFillColor(210, 165, 65); doc.circle(lx, ly, logoS/2 - 1.5, "F");
-          doc.setFillColor(242, 210, 100); doc.circle(lx, ly, logoS/2 - 3, "F");
+          const lx = logoX + logoS/2, ly = logoY + logoS/2;
+          doc.setFillColor(210, 165, 65); doc.circle(lx, ly, logoS/2, "F");
           doc.setTextColor(90, 45, 5);
           doc.setFont("helvetica", "bold"); doc.setFontSize(5);
-          doc.text("Sanskar", lx, ly - 3.5, { align: "center" });
-          doc.text("Pravas", lx, ly + 1, { align: "center" });
-          doc.setFontSize(4.5);
-          doc.text("2026", lx, ly + 5.5, { align: "center" });
+          doc.text("Satpurush", lx, ly, { align: "center" });
         }
 
-        // ── DIVIDER LINES ── (only left divider now, right side is content)
-        const divL = x + logoS + 4;
+        // ── DIVIDER ──
+        const divL = x + logoS + 5;
         const divR = x + cardW - 3;
-        doc.setDrawColor(195, 168, 118);
-        doc.setLineWidth(0.3);
-        doc.line(divL, y + 4, divL, y + cardH - 4);
-
-        // ── CENTER COLUMN ──
         const cw = divR - divL;
         const ccx = divL + cw / 2;
+        doc.setDrawColor(195, 168, 118);
+        doc.setLineWidth(0.3);
+        doc.line(divL, y + 4, divL, y + cardH - stripH - 2);
 
-        // NAME
+        // ── NAME ──
         doc.setTextColor(12, 12, 12);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(9.5);
+        doc.setFontSize(9);
         const nameLines = doc.splitTextToSize(kid.name.toUpperCase(), cw - 4);
-        doc.text(nameLines, ccx, y + 11, { align: "center" });
-        const nameEndY = y + 11 + (nameLines.length - 1) * 5.2;
+        const nameY = y + 10;
+        doc.text(nameLines, ccx, nameY, { align: "center" });
+        const nameEndY = nameY + (nameLines.length - 1) * 5;
 
         // Underline
         doc.setDrawColor(70, 70, 70);
         doc.setLineWidth(0.3);
-        doc.line(divL + 4, nameEndY + 2, divR - 4, nameEndY + 2);
+        doc.line(divL + 4, nameEndY + 2.5, divR - 4, nameEndY + 2.5);
 
-        // SEGMENT  (B A L A K)
+        // ── SEGMENT ──
         doc.setTextColor(45, 45, 45);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(7);
         doc.text(kid.segment.split("").join("  "), ccx, nameEndY + 8, { align: "center" });
 
-        // CONTACT NUMBERS (fixed, always shown)
+        // ── PHONE ──
         const phY = nameEndY + 15;
-        // Ph: label instead of icon (jsPDF can't render emoji)
         doc.setFillColor(45, 45, 45);
-        doc.roundedRect(divL + 1, phY - 3.5, 7, 4, 1, 1, "F");
+        doc.roundedRect(divL + 1, phY - 3.5, 8, 4.5, 1, 1, "F");
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(5);
-        doc.text("Ph:", divL + 4.5, phY - 0.8, { align: "center" });
+        doc.text("Ph:", divL + 5, phY - 0.5, { align: "center" });
         doc.setTextColor(15, 15, 15);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(7.5);
-        doc.text(CONTACT, divL + 9, phY, {});
+        doc.text(CONTACT, divL + 11, phY, {});
 
-        // QR CODE — 22x22mm, always fits
-        // Strip height reserved at bottom (uses aspect ratio calculated above)
-        const stripY = y + cardH - stripH;
-
-        // QR — positioned so it fits above strip with ID below it
-        const qrSize = 20;
+        // ── QR CODE ──
+        // Available space between phone and strip
+        const contentBottom = y + cardH - stripH - 3;
+        const qrSize = Math.min(22, contentBottom - phY - 8);
+        const qrY = phY + 5;
         const qrX = ccx - qrSize / 2;
-        // ID will be 5mm, gap 2mm above strip = 7mm reserved below QR
-        const qrY2 = stripY - qrSize - 7;
 
         const qrCanvas = document.createElement("canvas");
         await QRCodeLib.default.toCanvas(qrCanvas, kid.id, {
@@ -467,38 +447,35 @@ export default function App() {
           color: { dark: "#111111", light: "#ffffff" }
         });
         const qrDataUrl = qrCanvas.toDataURL("image/png");
-
-        // White bg + blue border
         doc.setFillColor(255, 255, 255);
         doc.setDrawColor(140, 165, 210);
         doc.setLineWidth(0.5);
-        doc.roundedRect(qrX - 1.5, qrY2 - 1.5, qrSize + 3, qrSize + 3, 2, 2, "FD");
-        doc.addImage(qrDataUrl, "PNG", qrX, qrY2, qrSize, qrSize);
+        doc.roundedRect(qrX - 1.5, qrY - 1.5, qrSize + 3, qrSize + 3, 2, 2, "FD");
+        doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
 
-        // ID — placed between QR and strip with enough space
+        // ── ID ──
         doc.setTextColor(85, 90, 125);
         doc.setFont("courier", "bold");
         doc.setFontSize(7);
-        doc.text(kid.id, ccx, qrY2 + qrSize + 5, { align: "center" });
+        doc.text(kid.id, ccx, qrY + qrSize + 5, { align: "center" });
 
-        // ── BOTTOM STRIP — actual image with rounded bottom corners ──
+        // ── BOTTOM STRIP ──
+        const stripY = y + cardH - stripH;
         if (bottomStrip) {
           doc.addImage(bottomStrip, "PNG", x, stripY, cardW, stripH);
-          // Cover square corners with white to fake rounded corners (bottom only)
+          // White covers for square bottom corners
           const cr = 3;
           doc.setFillColor(255, 255, 255);
           doc.setDrawColor(255, 255, 255);
-          // bottom-left corner square cover
           doc.rect(x, y + cardH - cr, cr, cr, "F");
-          // bottom-right corner square cover
           doc.rect(x + cardW - cr, y + cardH - cr, cr, cr, "F");
-          // Now redraw the card outer rounded border on top to restore look
-          doc.setDrawColor(185, 148, 80);
-          doc.setLineWidth(0.7);
-          doc.roundedRect(x, y, cardW, cardH, 3, 3, "S");
         }
 
-        // advance
+        // Redraw border on top of everything
+        doc.setDrawColor(185, 148, 80);
+        doc.setLineWidth(0.7);
+        doc.roundedRect(x, y, cardW, cardH, 3, 3, "S");
+
         col++;
         if (col >= cols) { col = 0; pageRow++; }
       }

@@ -348,7 +348,7 @@ export default function App() {
       // Card dimensions
       const cardW = 95;   // mm wide
       const cardH = 65;   // mm tall
-      const stripH = 18;  // bottom strip height mm
+      const stripH = 22;  // bottom strip height mm
       const cols = 2;
       const gapX = 5;
       const gapY = 5;

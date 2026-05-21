@@ -481,11 +481,12 @@ export default function App() {
         doc.setFontSize(5.5);
         doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, y + cardH - 1.5, { align: "center" });
 
-        // ── BAPS text below strip ──
+        // ── BAPS text in space between QR and strip ──
+        const bapsTextY = stripY - 2;
         doc.setTextColor(100, 70, 20);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(5.5);
-        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, y + cardH - 1.5, { align: "center" });
+        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, bapsTextY, { align: "center" });
 
         // Redraw border on top of everything
         doc.setDrawColor(185, 148, 80);

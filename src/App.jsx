@@ -348,7 +348,7 @@ export default function App() {
       // Card dimensions
       const cardW = 95;   // mm wide
       const cardH = 68;   // mm tall (extra 3mm for BAPS text below strip)
-      const stripH = 13;  // bottom strip height mm
+      const stripH = 9;  // bottom strip height mm
       const cols = 2;
       const gapX = 5;
       const gapY = 4;

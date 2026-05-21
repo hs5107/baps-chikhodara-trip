@@ -351,9 +351,9 @@ export default function App() {
       const stripH = 18;  // bottom strip height mm
       const cols = 2;
       const gapX = 5;
-      const gapY = 5;
+      const gapY = 4;
       const marginX = (210 - cols * cardW - gapX) / 2;
-      const marginY = 10;
+      const marginY = 8;
       const CONTACT = "9081840511 / 8160026021";
       const logoS = 26;
 
@@ -437,7 +437,7 @@ export default function App() {
         // ── QR CODE ──
         // Available space between phone and strip
         const contentBottom = y + cardH - stripH - 3;
-        const qrSize = Math.min(22, contentBottom - phY - 8);
+        const qrSize = Math.min(28, contentBottom - phY - 6);
         const qrY = phY + 5;
         const qrX = ccx - qrSize / 2;
 

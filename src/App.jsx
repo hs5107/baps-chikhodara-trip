@@ -401,12 +401,18 @@ export default function App() {
         doc.setLineWidth(0.3);
         doc.line(divL, y + 4, divL, y + cardH - stripH - 2);
 
+        // ── BAPS header text ──
+        doc.setTextColor(130, 90, 20);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(5.5);
+        doc.text("BAPS Chikhodara Mandal - Anand", ccx, y + 6, { align: "center" });
+
         // ── NAME ──
         doc.setTextColor(12, 12, 12);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
         const nameLines = doc.splitTextToSize(kid.name.toUpperCase(), cw - 4);
-        const nameY = y + 10;
+        const nameY = y + 12;
         doc.text(nameLines, ccx, nameY, { align: "center" });
         const nameEndY = nameY + (nameLines.length - 1) * 5;
 
@@ -475,11 +481,7 @@ export default function App() {
           doc.rect(x + cardW - cr, y + cardH - cr, cr, cr, "F");
         }
 
-        // ── BAPS text — between QR bottom and strip top ──
-        doc.setTextColor(100, 70, 20);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(5.5);
-        doc.text("BAPS Chikhodara Bal Mandal - Anand", x + cardW / 2, stripY - 2, { align: "center" });
+
 
         // Redraw border on top of everything
         doc.setDrawColor(185, 148, 80);

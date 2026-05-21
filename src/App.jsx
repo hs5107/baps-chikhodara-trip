@@ -348,7 +348,7 @@ export default function App() {
       // Card dimensions
       const cardW = 95;   // mm wide
       const cardH = 65;   // mm tall
-      const stripH = 12;  // bottom strip height mm
+      const stripH = 13;  // bottom strip height mm
       const cols = 2;
       const gapX = 5;
       const gapY = 4;
@@ -447,17 +447,21 @@ export default function App() {
           color: { dark: "#111111", light: "#ffffff" }
         });
         const qrDataUrl = qrCanvas.toDataURL("image/png");
+        // QR left-aligned to give space for ID on right
+        const qrXLeft = divL + 2;
         doc.setFillColor(255, 255, 255);
         doc.setDrawColor(140, 165, 210);
         doc.setLineWidth(0.5);
-        doc.roundedRect(qrX - 1.5, qrY - 1.5, qrSize + 3, qrSize + 3, 2, 2, "FD");
-        doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
+        doc.roundedRect(qrXLeft - 1.5, qrY - 1.5, qrSize + 3, qrSize + 3, 2, 2, "FD");
+        doc.addImage(qrDataUrl, "PNG", qrXLeft, qrY, qrSize, qrSize);
 
-        // ── ID ──
+        // ── ID — right side of QR ──
+        const idX = qrXLeft + qrSize + 4;
+        const idY = qrY + qrSize / 2;
         doc.setTextColor(85, 90, 125);
         doc.setFont("courier", "bold");
-        doc.setFontSize(7);
-        doc.text(kid.id, ccx, qrY + qrSize + 5, { align: "center" });
+        doc.setFontSize(8);
+        doc.text(kid.id, idX, idY, {});
 
         // ── BOTTOM STRIP ──
         const stripY = y + cardH - stripH;
